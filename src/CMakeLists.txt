@@ -1,6 +1,4 @@
 include_directories(
-  ${CMAKE_SOURCE_DIR}/external/qhttp/src
-  ${CMAKE_SOURCE_DIR}/external/qslog
   ${CMAKE_SOURCE_DIR}/external/SPMediaKeyTap
   ${CMAKE_SOURCE_DIR}/external/HIDRemote
   ${CMAKE_SOURCE_DIR}/external/plistparser
@@ -109,7 +107,9 @@ endif()
 set(RESOURCE_ROOT .)
 if(APPLE)
   set(RESOURCE_ROOT Resources)
-  add_resources(TARGET ${MAIN_TARGET} SOURCES ${CMAKE_CURRENT_BINARY_DIR}/../dist/ DEST ${RESOURCE_ROOT}/web-client/desktop)
+  if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/../dist/)
+    add_resources(TARGET ${MAIN_TARGET} SOURCES ${CMAKE_CURRENT_BINARY_DIR}/../dist/ DEST ${RESOURCE_ROOT}/web-client/desktop)
+  endif()
   add_resources(TARGET ${MAIN_TARGET} SOURCES ${CMAKE_SOURCE_DIR}/native/ DEST ${RESOURCE_ROOT}/web-client/extension)
 endif()
 
@@ -123,7 +123,9 @@ if(NOT APPLE)
       install(FILES ${loc}/qtwebengine_devtools_resources.pak DESTINATION resources)
     endif()
   endforeach()
-  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../dist/ DESTINATION ${INSTALL_RESOURCE_DIR}/web-client/desktop)
+  if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/../dist/)
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../dist/ DESTINATION ${INSTALL_RESOURCE_DIR}/web-client/desktop)
+  endif()
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/native/ DESTINATION ${INSTALL_RESOURCE_DIR}/web-client/extension)
 endif()
 
@@ -170,8 +172,6 @@ endif()
 
 target_link_libraries(${MAIN_TARGET}
   shared
-  qhttp
-  qslog
   ${MPV_LIBRARY}
   ${OPENGL_LIBS}
   ${QT5_LIBRARIES}

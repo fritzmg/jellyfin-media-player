@@ -128,6 +128,25 @@
         "value": "ignoreSSLErrors",
         "default": false,
         "hidden": true
+      },
+      {
+        "value": "forceExternalWebclient",
+        "default": false
+      },
+      {
+        "value": "userWebClient",
+        "default": "",
+        "hidden": true
+      },
+      {
+        "value": "enableWindowsMediaIntegration",
+        "default": true,
+        "platforms": [ "windows" ]
+      },
+      {
+        "value": "enableWindowsTaskbarIntegration",
+        "default": true,
+        "platforms": [ "windows" ]
       }
     ]
   },
@@ -250,6 +269,38 @@
         "value": "deinterlace",
         "default": false,
         "platforms_excluded": "oe_rpi"
+      },
+      {
+        "value": "allow_transcode_to_hevc",
+        "default": false
+      },
+      {
+        "value": "force_transcode_hdr",
+        "default": false
+      },
+      {
+        "value": "prefer_transcode_to_h265",
+        "default": false
+      },
+      {
+        "value": "force_transcode_hi10p",
+        "default": false
+      },
+      {
+        "value": "force_transcode_hevc",
+        "default": false
+      },
+      {
+        "value": "force_transcode_av1",
+        "default": false
+      },
+      {
+        "value": "force_transcode_4k",
+        "default": false
+      },
+      {
+        "value": "always_force_transcode",
+        "default": false
       },
       {
         "value": "sync_mode",

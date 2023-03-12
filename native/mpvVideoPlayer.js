@@ -7,13 +7,18 @@
     }
 
     class mpvVideoPlayer {
-        constructor({ events, loading, appRouter, globalize, appHost, appSettings, confirm }) {
+        constructor({ events, loading, appRouter, globalize, appHost, appSettings, confirm, dashboard }) {
             this.events = events;
             this.loading = loading;
             this.appRouter = appRouter;
             this.globalize = globalize;
             this.appHost = appHost;
             this.appSettings = appSettings;
+
+            // this can be removed after 10.9
+            this.setTransparency = (dashboard && dashboard.setBackdropTransparency)
+                ? dashboard.setBackdropTransparency.bind(dashboard)
+                : appRouter.setTransparency.bind(appRouter);
 
             /**
              * @type {string}
@@ -151,12 +156,11 @@
                     this.setVolume(volume, false);
 
                     this.setPlaybackRate(1);
-                    this.setMute(false, false);
 
                     if (this._currentPlayOptions.fullscreen) {
                         this.appRouter.showVideoOsd().then(this.onNavigatedToOsd);
                     } else {
-                        this.appRouter.setTransparency('backdrop');
+                        this.setTransparency('backdrop');
                         this._videoDialog.dlg.style.zIndex = 'unset';
                     }
 
@@ -467,7 +471,8 @@
             window.api.player.stop();
             window.api.power.setScreensaverEnabled(true);
 
-            this.appRouter.setTransparency('none');
+            this.setTransparency('none');
+
             document.body.classList.remove('hide-scroll');
 
             const dlg = this._videoDialog;
@@ -581,7 +586,7 @@
      * @private
      */
     static getSupportedFeatures() {
-        return ['PlaybackRate'];
+        return ['PlaybackRate', 'SetAspectRatio'];
     }
 
     supports(feature) {
@@ -739,20 +744,6 @@
         return this._muted;
     }
 
-    setAspectRatio() {
-    }
-
-    getAspectRatio() {
-        return this._currentAspectRatio || 'auto';
-    }
-
-    getSupportedAspectRatios() {
-        return [{
-            name: this.globalize.translate('Auto'),
-            id: 'auto'
-        }];
-    }
-
     togglePictureInPicture() {
     }
 
@@ -816,6 +807,37 @@
         return Promise.resolve({
             categories: categories
         });
+    }
+
+    getSupportedAspectRatios() {
+        const options = window.jmpInfo.settingsDescriptions.video.find(x => x.key == 'aspect').options;
+        const current = window.jmpInfo.settings.video.aspect;
+
+        const getOptionName = (option) => {
+            const canTranslate = {
+                'normal': 'Auto',
+                'zoom': 'AspectRatioCover',
+                'stretch': 'AspectRatioFill',
+            }
+            const name = option.replace('video.aspect.', '');
+            return canTranslate[name]
+                ? this.globalize.translate(canTranslate[name])
+                : name;
+        }
+
+        return options.map(x => ({
+            id: x.value,
+            name: getOptionName(x.title),
+            selected: x.value == current
+        }));
+    }
+
+    getAspectRatio() {
+        return window.jmpInfo.settings.video.aspect;
+    }
+
+    setAspectRatio(value) {
+        window.jmpInfo.settings.video.aspect = value;
     }
     }
 /* eslint-enable indent */
